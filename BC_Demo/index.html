@@ -1,0 +1,99 @@
+<script src="web3.min.js"></script>
+
+
+<script type="text/javascript">
+    async function loadWeb3() {
+        if (window.ethereum) {
+            window.web3 = new Web3(window.ethereum);
+            window.ethereum.enable();
+        }
+    }
+​
+    async function load() {
+        await loadWeb3();
+        window.contract = await loadContract();
+    }
+​
+    load();
+​
+    calculatorAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "h",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "w",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateArea",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getArea",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "area",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+​
+    async function loadContract() {
+        return await new window.web3.eth.Contract(calculatorAbi, '0xC5cDfC55e4b192ee39525962A78a169EFeBd2Dc4');
+    }
+​
+    async function populate() {
+        const calculator = await window.contract.methods.getHeight().call();
+        console.log(calculator);
+        let table = document.getElementById('calculator');
+        table.innerHTML = '<tr><th>Height</th><th>Weight</th></tr>';
+​
+        for (i = 0; i < calculator.length; i++) {
+            let row = table.insertRow();
+            let cell1 = row.insertCell(0);
+            let cell2 = row.insertCell(1);
+            let cell3 = row.insertCell(2);
+​
+            cell1.innerHTML = calculator[i].height;
+            cell2.innerHTML = calculator[i].weight;
+            cell3.innerHTML = calculator[i].area;
+            
+​
+            console.log(`| ${calculator[i].height} | ${calculator[i].weight} |`);
+        }
+    }
+​
+    async function area() {
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+        console.log(`${height} ${weight}`);
+        response = await window.contract.methods.createCalculation(height, weight).send({ from: '0xC5cDfC55e4b192ee39525962A78a169EFeBd2Dc4' });
+        console.log(response);
+        await populate();
+    }
+​
+  
+​
+</script>
+​
+Height: <input id="height" type="text" value="">
+<br>
+Weight: <input id="author" type="text" value="">
+<hr>
+<button onclick="add();">Area</button>
+<hr>
+
+<table border="1" id="calculator">
+</table>
