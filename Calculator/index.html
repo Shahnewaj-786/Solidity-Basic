@@ -1,0 +1,35 @@
+<script src="web3.min.js"></script>
+<script src="calculatorAbi.js"></script>
+
+<script type="text/javascript">
+    async function load() {
+        if (window.ethereum) {
+            window.web3 = new Web3(window.ethereum);
+            window.ethereum.enable();
+        }
+        window.contract = new window.web3.eth.Contract(calculatorAbi, '0x5BFaE5401e509B00E94EBb0469d82704EC151443');
+    }
+
+    load();
+
+    async function add() {
+        const height = document.getElementById('height').value;
+        const width = document.getElementById('weight').value;
+        console.log(`${height} ${width}`);
+        
+        // result = height * width;
+        await window.contract.methods.calculateArea(height, width).send({ from: '0x10B94Dd4dE11FDE62ebC2264c0aDA07FBA857C52'});
+        result = await window.contract.methods.getArea().call();
+
+        console.log(result);
+        document.getElementById("result").innerHTML = result;
+    }
+</script>
+
+Height: <input id="height" type="text" value="10">
+<br>
+Weight: <input id="weight" type="text" value="20">
+<hr>
+<button onclick="add();">Area</button>
+<hr>
+<div id="result"></div>
